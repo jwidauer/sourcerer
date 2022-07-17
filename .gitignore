@@ -35,5 +35,5 @@
 .vscode/
 
 # Build directories
-build/
-builddir/
+build
+builddir
