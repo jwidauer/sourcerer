@@ -29,43 +29,12 @@ Node::Node(const Node* parent, const null_t& value) : parent_{parent}, children_
 
 Node::Node(const Node* parent, const value_t& value) : parent_{parent}, children_{value} {}
 
-Node::Node(const Node* parent, const array_t& value) : parent_{parent} {
-  children_.emplace<array_t>();
-  std::get<array_t>(children_).reserve(value.size());
+Node::Node(const Node* parent, const array_t& value) : parent_{parent} { copy(value); }
 
-  for (const auto& child : value) {
-    std::get<array_t>(children_).emplace_back(std::make_unique<Node>(this, *child));
-  }
-}
-
-Node::Node(const Node* parent, const object_t& value) : parent_{parent} {
-  children_.emplace<object_t>();
-
-  for (const auto& [key, val] : value) {
-    std::get<object_t>(children_).emplace(key, std::make_unique<Node>(this, *val));
-  }
-}
+Node::Node(const Node* parent, const object_t& value) : parent_{parent} { copy(value); }
 
 Node::Node(const Node* parent, const Node& other) : parent_{parent} {
-  if (other.is_null()) {
-    children_ = other.get<null_t>();
-  } else if (other.is_value()) {
-    children_ = other.get<value_t>();
-  } else if (other.is_object()) {
-    children_.emplace<object_t>();
-    for (const auto& [key, value] : other.get<object_t>()) {
-      std::get<object_t>(children_).emplace(key, std::make_unique<Node>(this, *value));
-    }
-  } else if (other.is_array()) {
-    children_.emplace<array_t>();
-    std::get<array_t>(children_).reserve(other.get<array_t>().size());
-
-    for (const auto& value : other.get<array_t>()) {
-      std::get<array_t>(children_).push_back(std::make_unique<Node>(this, *value));
-    }
-  } else {
-    assert(false);
-  }
+  std::visit([this](auto&& v) { this->copy(v); }, other.children_);
 }
 
 Node::reference Node::at(const index_t index) { return *(get<array_t>().at(index)); }

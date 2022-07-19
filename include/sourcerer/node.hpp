@@ -13,6 +13,14 @@
 
 namespace sourcerer {
 
+// helper type for the visitor
+template <typename... Ts>
+struct Overload : Ts... {
+  using Ts::operator()...;
+};
+template <class... Ts>
+Overload(Ts...) -> Overload<Ts...>;
+
 class SOURCERER_API Node {
  public:
   using reference = Node&;
@@ -74,8 +82,12 @@ class SOURCERER_API Node {
 
   template <typename T>
   T as() const {
-    return std::visit(detail::convert<T>, children_);
+    return std::visit([](auto&& arg) { return detail::convert<T>(arg); }, children_);
   }
+
+  // std::string to_string() const {
+  //   return std::visit([](auto&& arg) { return detail::convert_s(arg); }, children_);
+  // }
 
  private:
   template <class T>
@@ -107,6 +119,24 @@ class SOURCERER_API Node {
       return std::get<T>(children_);
     } catch (const std::exception& e) {
       throw std::runtime_error("Node is not an " + detail::type_name<T>());
+    }
+  }
+
+  void copy(const null_t&) { children_.emplace<null_t>(); }
+  void copy(const value_t& value) { children_.emplace<value_t>(value); }
+  void copy(const array_t& value) {
+    children_.emplace<array_t>();
+    std::get<array_t>(children_).reserve(value.size());
+
+    for (const auto& node : value) {
+      std::get<array_t>(children_).push_back(std::make_unique<Node>(this, *node));
+    }
+  }
+  void copy(const object_t& value) {
+    children_.emplace<object_t>();
+
+    for (const auto& [key, node] : value) {
+      std::get<object_t>(children_).emplace(key, std::make_unique<Node>(this, *node));
     }
   }
 
