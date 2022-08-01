@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sourcerer/detail/helpers.hpp>
+
 #include <memory>
 #include <string>
 #include <type_traits>
@@ -13,6 +15,8 @@ class Node;
 
 namespace detail {
 
+using size_type = std::size_t;
+
 using index_t = size_t;
 using key_t = std::string;
 
@@ -20,10 +24,6 @@ using null_t = std::monostate;
 using value_t = std::string;
 using array_t = std::vector<std::unique_ptr<Node>>;
 using object_t = std::unordered_map<key_t, std::unique_ptr<Node>>;
-
-// Helper for type name function.
-template <class>
-inline constexpr bool always_false_v = false;
 
 template <class T>
 constexpr std::string type_name() noexcept {

@@ -45,6 +45,7 @@ BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Attach
 BreakBeforeInheritanceComma: false
 BreakInheritanceList: BeforeColon
+BreakBeforeConceptDeclarations: Always
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeColon
@@ -85,6 +86,7 @@ IncludeIsMainSourceRegex: ''
 IndentCaseLabels: true
 IndentGotoLabels: true
 IndentPPDirectives: None
+IndentRequiresClause: true
 IndentWidth:     2
 IndentWrappedFunctionNames: false
 JavaScriptQuotes: Leave
@@ -136,6 +138,7 @@ RawStringFormats:
     CanonicalDelimiter: ''
     BasedOnStyle:    google
 ReflowComments:  true
+RequiresClausePosition: OwnLine
 SortIncludes:    true
 SortUsingDeclarations: true
 SpaceAfterCStyleCast: false

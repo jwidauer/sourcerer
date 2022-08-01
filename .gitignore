@@ -37,3 +37,7 @@
 # Build directories
 build
 builddir
+
+# Subprojects
+subprojects/*
+!*.wrap
