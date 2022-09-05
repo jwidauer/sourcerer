@@ -6,6 +6,8 @@
 TEST_SUITE_BEGIN("[Node]");
 using namespace sourcerer;
 
+TYPE_TO_STRING(Node);
+
 TEST_CASE("Simple constructors") {
   SUBCASE("default constructor") {
     Node node;
@@ -65,24 +67,40 @@ TEST_CASE_TEMPLATE("Move constructors", T, Node::null_t, Node::value_t, Node::ar
   }
 }
 
-TEST_CASE("Array accessors") {
-  using namespace sourcerer;
-  Node node;
-  node.push_back("value");
+TEST_CASE_TEMPLATE("Array accessors", T, Node, const Node) {
+  Node init_node;
+  init_node.push_back("value");
+
+  T node{init_node};
 
   SUBCASE("at") {
     CHECK(node.at(0).is_value());
-    CHECK(node.at(0).as<Node::value_t>() == "value");
+    CHECK(node.at(0) == Node{"value"});
   }
 
   SUBCASE("operator[]") {
     CHECK(node[0].is_value());
-    CHECK(node[0].as<Node::value_t>() == "value");
+    CHECK(node[0] == Node{"value"});
+  }
+
+  SUBCASE("at should throw if index is out of bounds") {
+    CHECK_THROWS_AS(node.at(1), std::out_of_range);
+  }
+
+  SUBCASE("at should throw if index is negative") {
+    CHECK_THROWS_AS(node.at(-1), std::out_of_range);
+  }
+
+  SUBCASE("at should throw with non-integral index") {
+    CHECK_THROWS_AS(node.at("key"), std::runtime_error);
+  }
+
+  SUBCASE("operator[] should throw with non-integral index") {
+    CHECK_THROWS_AS(node["key"], std::runtime_error);
   }
 }
 
 TEST_CASE("Array modifiers") {
-  using namespace sourcerer;
   Node node;
 
   SUBCASE("emplace_back") {
@@ -116,6 +134,18 @@ TEST_CASE("Array modifiers") {
       CHECK(node.empty());
     }
 
+    SUBCASE("erase should throw if index is out of bounds") {
+      CHECK_THROWS_AS(node.erase(1), std::out_of_range);
+    }
+
+    SUBCASE("erase should throw if index is negative") {
+      CHECK_THROWS_AS(node.erase(-1), std::out_of_range);
+    }
+
+    SUBCASE("erase should throw with non-integral index") {
+      CHECK_THROWS_AS(node.erase("key"), std::runtime_error);
+    }
+
     SUBCASE("clear") {
       node.clear();
       CHECK(node.empty());
@@ -137,24 +167,36 @@ TEST_CASE("Array modifiers") {
   }
 }
 
-TEST_CASE("Object accessors") {
-  using namespace sourcerer;
-  Node node;
-  node["key"] = "value";
+TEST_CASE_TEMPLATE("Object accessors", T, Node, const Node) {
+  Node init_node;
+  init_node["key"] = "value";
+
+  T node{init_node};
 
   SUBCASE("at") {
     CHECK(node.at("key").is_value());
-    CHECK(node.at("key").as<Node::value_t>() == "value");
+    CHECK(node.at("key") == Node{"value"});
   }
 
   SUBCASE("operator[]") {
     CHECK(node["key"].is_value());
-    CHECK(node["key"].as<Node::value_t>() == "value");
+    CHECK(node["key"] == Node{"value"});
+  }
+
+  SUBCASE("at should throw if key is not found") {
+    CHECK_THROWS_AS(node.at("key2"), std::out_of_range);
+  }
+
+  SUBCASE("at should throw with non-string key") {
+    CHECK_THROWS_AS(node.at(0), std::runtime_error);
+  }
+
+  SUBCASE("operator[] should throw with non-string key") {
+    CHECK_THROWS_AS(node[0], std::runtime_error);
   }
 }
 
 TEST_CASE("Object modifiers") {
-  using namespace sourcerer;
   Node node;
 
   SUBCASE("insert") {
@@ -175,6 +217,10 @@ TEST_CASE("Object modifiers") {
     SUBCASE("erase") {
       node.erase("key");
       CHECK(node.empty());
+    }
+
+    SUBCASE("erase should throw with non-string key") {
+      CHECK_THROWS_AS(node.erase(0), std::runtime_error);
     }
 
     SUBCASE("clear") {
@@ -218,6 +264,24 @@ TEST_CASE("Size") {
     CHECK(!node.empty());
     CHECK(node.size() == 3);
   }
+
+  SUBCASE("value") {
+    node = "value";
+    CHECK(!node.empty());
+    CHECK(node.size() == 1);
+  }
+}
+
+TEST_CASE("Operators") {
+  SUBCASE("operator==") {
+    CHECK(Node{"value"} == Node{"value"});
+    CHECK_FALSE(Node{"value"} == Node{"value2"});
+  }
+
+  SUBCASE("operator!=") {
+    CHECK_FALSE(Node{"value"} != Node{"value"});
+    CHECK(Node{"value"} != Node{"value2"});
+  }
 }
 
 TEST_CASE("Swap") {
@@ -228,6 +292,49 @@ TEST_CASE("Swap") {
   node1.swap(node2);
   CHECK(node1[0].as<Node::value_t>() == "value2");
   CHECK(node2[0].as<Node::value_t>() == "value1");
+}
+
+TEST_CASE("Iterator") {
+  Node node;
+  node.push_back("value1");
+  node.push_back("value2");
+  node.push_back("value3");
+
+  SUBCASE("begin") {
+    auto it = node.begin();
+    CHECK(it->as<Node::value_t>() == "value1");
+  }
+
+  SUBCASE("end") {
+    auto begin = node.begin();
+    auto end = node.end();
+    CHECK(begin != end);
+
+    begin++;
+    begin++;
+    begin++;
+    CHECK(begin == end);
+  }
+
+  SUBCASE("Accessing") {
+    auto it = node.begin();
+
+    SUBCASE("operator->") {
+      CHECK(it->as<Node::value_t>() == "value1");
+      it++;
+      CHECK(it->as<Node::value_t>() == "value2");
+      it++;
+      CHECK(it->as<Node::value_t>() == "value3");
+    }
+
+    SUBCASE("operator*") {
+      CHECK((*it).as<Node::value_t>() == "value1");
+      it++;
+      CHECK((*it).as<Node::value_t>() == "value2");
+      it++;
+      CHECK((*it).as<Node::value_t>() == "value3");
+    }
+  }
 }
 
 TEST_SUITE_END();

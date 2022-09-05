@@ -25,3 +25,7 @@ pkg_mod.generate(
     libraries : lib,
     version : '0.1'
 )
+
+run_target('cppcheck', command: ['cppcheck', '--enable=all', '--suppress=*:' +
+    join_paths(meson.source_root(), 'subprojects') + '*', '--suppress=missingIncludeSystem',
+    '--std=c++20', '--project=' + join_paths(meson.build_root(), 'compile_commands.json')])

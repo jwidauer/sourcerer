@@ -38,8 +38,7 @@ value_t from(const bool& value) {
   return value ? "true" : "false";
 }
 
-template <class T>
-  requires number<T>
+template <number T>
 T from(const value_t& value) {
   const std::string_view sv{value};
   T result;
@@ -52,8 +51,7 @@ T from(const value_t& value) {
   return result;
 }
 
-template <class T>
-  requires number<T>
+template <number T>
 value_t from(const T& value) {
   constexpr auto buffer_size{std::is_integral_v<T> ? std::numeric_limits<T>::digits10 + 1 : 100};
 

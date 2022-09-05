@@ -1,33 +1,41 @@
 #pragma once
 
 #include <sourcerer/common.hpp>
+#include <sourcerer/detail/concepts.hpp>
 #include <sourcerer/detail/from.hpp>
+#include <sourcerer/detail/node_iterator.hpp>
 #include <sourcerer/detail/types.hpp>
 
 #include <algorithm>
 #include <functional>
+#include <iterator>
 #include <memory>
 #include <string>
-#include <unordered_map>
 #include <variant>
 #include <vector>
 
 namespace sourcerer {
 
-// helper type for the visitor
-template <typename... Ts>
-struct Overload : Ts... {
-  using Ts::operator()...;
-};
-template <class... Ts>
-Overload(Ts...) -> Overload<Ts...>;
-
 class SOURCERER_API Node {
- public:
-  using reference = Node&;
-  using const_reference = const Node&;
+ private:
+  template <detail::basic_node NodeType>
+  friend class detail::iter_impl;
 
-  using size_type = detail::size_type;
+ public:
+  // the type of elements in a Node container
+  using value_type = Node;
+  using const_value_type = const Node;
+
+  // the type of an element reference
+  using reference = value_type&;
+  // the type of an element const reference
+  using const_reference = const value_type&;
+
+  // a type to represent differences between iterators
+  using difference_type = std::ptrdiff_t;
+  // a type to represent container sizes
+  using size_type = std::size_t;
+
   using key_type = detail::key_t;
 
   using null_t = detail::null_t;
@@ -35,22 +43,43 @@ class SOURCERER_API Node {
   using array_t = detail::array_t;
   using object_t = detail::object_t;
 
+  // the allocator type
+  using allocator_type = std::allocator<Node>;
+
+  // the type of an element pointer
+  using pointer = typename std::allocator_traits<allocator_type>::pointer;
+  // the type of an element const pointer
+  using const_pointer = typename std::allocator_traits<allocator_type>::const_pointer;
+
+  // an iterator for a Node container
+  using iterator = detail::iter_impl<Node>;
+  static_assert(std::bidirectional_iterator<iterator>);
+
+  // a const iterator for a Node container
+  using const_iterator = detail::iter_impl<const Node>;
+  static_assert(std::bidirectional_iterator<const_iterator>);
+
+  // a reverse iterator for a Node container
+  // using reverse_iterator = detail::reverse_iterator<typename Node::iterator>;
+  // // a const reverse iterator for a Node container
+  // using const_reverse_iterator = detail::reverse_iterator<typename Node::const_iterator>;
+
   Node() = default;
   ~Node() = default;
 
-  Node(const null_t& value);
-  Node(const value_t& value);
-  Node(const array_t& value);
-  Node(const object_t& value);
+  explicit Node(const null_t& value);
+  explicit Node(const value_t& value);
+  explicit Node(const array_t& value);
+  explicit Node(const object_t& value);
   Node(const Node& other);
 
-  Node(null_t&& value);
-  Node(value_t&& value);
-  Node(array_t&& value);
-  Node(object_t&& value);
+  explicit Node(null_t&& value);
+  explicit Node(value_t&& value);
+  explicit Node(array_t&& value);
+  explicit Node(object_t&& value);
   Node(Node&& other) = default;
 
-  Node(const Node* parent);
+  explicit Node(const Node* parent);
   Node(const Node* parent, const null_t& value);
   Node(const Node* parent, const value_t& value);
   Node(const Node* parent, const array_t& value);
@@ -139,12 +168,24 @@ class SOURCERER_API Node {
     return operator=(Node{detail::from(value)});
   }
 
+  bool operator==(const Node& other) const;
+  bool operator!=(const Node& other) const;
+
   void swap(Node& other) noexcept;
 
   template <typename T>
   T as() const {
     return std::visit([](auto&& arg) { return detail::from<T>(arg); }, children_);
   }
+
+  iterator begin() noexcept;
+  iterator end() noexcept;
+
+  const_iterator begin() const noexcept;
+  const_iterator end() const noexcept;
+
+  const_iterator cbegin() const noexcept;
+  const_iterator cend() const noexcept;
 
   // std::string to_string() const {
   //   return std::visit([](auto&& arg) { return detail::convert_s(arg); }, children_);
@@ -212,6 +253,8 @@ class SOURCERER_API Node {
 
   const Node* parent_ = nullptr;
   std::variant<null_t, value_t, array_t, object_t> children_;
+
+  static_assert(detail::basic_node<Node>);
 };
 
 }  // namespace sourcerer

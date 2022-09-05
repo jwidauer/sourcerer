@@ -86,6 +86,10 @@ void Node::erase(const size_type index) {
     throw std::runtime_error("Can't erase with index on a node of type " + type_name());
   }
 
+  if (index >= std::get<array_t>(children_).size()) {
+    throw std::out_of_range("Index out of range");
+  }
+
   std::get<array_t>(children_).erase(std::get<array_t>(children_).begin() + index);
 }
 
@@ -98,20 +102,19 @@ void Node::erase(const key_type& key) {
 }
 
 void Node::clear() {
-  std::visit(
-      overloaded{[](null_t&) { throw std::runtime_error{"Can't clear a node of type null"}; },
-                 [](auto&& v) { v.clear(); }},
-      children_);
+  std::visit(overloaded{[](null_t&) {}, [](auto&& v) { v.clear(); }}, children_);
 }
 
 bool Node::empty() const noexcept {
   return std::visit(
-      overloaded{[](const null_t&) { return true; }, [](const auto& v) { return v.empty(); }},
+      overloaded{[](const null_t&) { return true; }, [](const value_t&) { return false; },
+                 [](const auto& v) { return v.empty(); }},
       children_);
 }
 
 Node::size_type Node::size() const noexcept {
-  return std::visit(overloaded{[](const null_t&) { return Node::size_type{}; },
+  return std::visit(overloaded{[](const null_t&) { return Node::size_type{0}; },
+                               [](const value_t&) { return Node::size_type{1}; },
                                [](const auto& v) { return v.size(); }},
                     children_);
 }
@@ -150,9 +153,49 @@ Node::reference Node::operator=(const Node& other) {
   return *this;
 }
 
+bool Node::operator==(const Node& other) const { return children_ == other.children_; }
+
+bool Node::operator!=(const Node& other) const { return !(*this == other); }
+
 void Node::swap(Node& other) noexcept {
   std::swap(parent_, other.parent_);
   children_.swap(other.children_);
+}
+
+Node::iterator Node::begin() noexcept {
+  iterator it{this};
+  it.set_begin();
+  return it;
+}
+
+Node::const_iterator Node::begin() const noexcept {
+  const_iterator it{this};
+  it.set_begin();
+  return it;
+}
+
+Node::const_iterator Node::cbegin() const noexcept {
+  const_iterator it{this};
+  it.set_begin();
+  return it;
+}
+
+Node::iterator Node::end() noexcept {
+  iterator it{this};
+  it.set_end();
+  return it;
+}
+
+Node::const_iterator Node::end() const noexcept {
+  const_iterator it{this};
+  it.set_end();
+  return it;
+}
+
+Node::const_iterator Node::cend() const noexcept {
+  const_iterator it{this};
+  it.set_end();
+  return it;
 }
 
 }  // namespace sourcerer
