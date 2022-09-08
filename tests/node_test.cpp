@@ -335,6 +335,65 @@ TEST_CASE("Iterator") {
       CHECK((*it).as<Node::value_t>() == "value3");
     }
   }
+
+  SUBCASE("Increment") {
+    auto it = node.begin();
+
+    SUBCASE("operator++") {
+      CHECK(it->as<Node::value_t>() == "value1");
+      ++it;
+      CHECK(it->as<Node::value_t>() == "value2");
+      ++it;
+      CHECK(it->as<Node::value_t>() == "value3");
+    }
+
+    SUBCASE("operator++(int)") {
+      CHECK(it->as<Node::value_t>() == "value1");
+      it++;
+      CHECK(it->as<Node::value_t>() == "value2");
+      it++;
+      CHECK(it->as<Node::value_t>() == "value3");
+    }
+  }
+
+  SUBCASE("Decrement") {
+    auto it = node.end();
+
+    SUBCASE("operator--") {
+      --it;
+      CHECK(it->as<Node::value_t>() == "value3");
+      --it;
+      CHECK(it->as<Node::value_t>() == "value2");
+      --it;
+      CHECK(it->as<Node::value_t>() == "value1");
+    }
+
+    SUBCASE("operator--(int)") {
+      it--;
+      CHECK(it->as<Node::value_t>() == "value3");
+      it--;
+      CHECK(it->as<Node::value_t>() == "value2");
+      it--;
+      CHECK(it->as<Node::value_t>() == "value1");
+    }
+  }
+
+  SUBCASE("Comparison") {
+    auto it1 = node.begin();
+    auto it2 = node.begin();
+
+    SUBCASE("operator==") {
+      CHECK(it1 == it2);
+      it1++;
+      CHECK_FALSE(it1 == it2);
+    }
+
+    SUBCASE("operator!=") {
+      CHECK_FALSE(it1 != it2);
+      it1++;
+      CHECK(it1 != it2);
+    }
+  }
 }
 
 TEST_SUITE_END();

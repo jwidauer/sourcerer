@@ -4,6 +4,7 @@
 #include <sourcerer/detail/helpers.hpp>
 
 #include <cassert>
+#include <compare>
 #include <variant>
 
 namespace sourcerer::detail {
@@ -48,11 +49,11 @@ class iter_impl {
   void set_begin() {
     assert(node_ != nullptr);
 
-    std::visit(overloaded{[&](auto&) -> void { iter_.simple = 1; },
-                          [&](BasicNode::value_t&) -> void { iter_.simple = 0; },
-                          [&](BasicNode::array_t& v) -> void { iter_.array = v.begin(); },
-                          [&](BasicNode::object_t& v) -> void { iter_.object = v.begin(); }},
-               node_->children_);
+    std::visit(
+        overloaded{[&](auto&) { iter_.simple = 1; }, [&](BasicNode::value_t&) { iter_.simple = 0; },
+                   [&](BasicNode::array_t& v) { iter_.array = v.begin(); },
+                   [&](BasicNode::object_t& v) { iter_.object = v.begin(); }},
+        node_->children_);
   }
 
   void set_end() {
@@ -130,37 +131,6 @@ class iter_impl {
   }
 
   bool operator!=(const iter_impl& other) const { return !(*this == other); }
-
-  bool operator<(const iter_impl& other) const {
-    if (node_ != other.node_) return false;
-
-    assert(node_ != nullptr);
-
-    return std::visit(
-        overloaded{[&](auto&) { return iter_.simple < other.iter_.simple; },
-                   [&](BasicNode::array_t&) { return iter_.array < other.iter_.array; },
-                   [&](BasicNode::object_t&) { return iter_.object < other.iter_.object; }},
-        node_->children_);
-  }
-
-  bool operator>(const iter_impl& other) const { return other < *this; }
-
-  bool operator<=(const iter_impl& other) const { return !(other < *this); }
-
-  bool operator>=(const iter_impl& other) const { return !(*this < other); }
-
-  difference_type operator-(const iter_impl& other) const {
-    assert(node_ != nullptr);
-
-    if (node_ != other.node_) throw std::out_of_range{""};
-    return std::visit(
-        overloaded{[&](auto&) { return iter_.simple - other.iter_.simple; },
-                   [&](BasicNode::array_t&) { return iter_.array - other.iter_.array; },
-                   [&](BasicNode::object_t&) { return iter_.object - other.iter_.object; }},
-        node_->children_);
-  }
-
-  friend difference_type operator-(const iter_impl& it1, const iter_impl& it2) { return it2 - it1; }
 
  private:
   union iter_t {
