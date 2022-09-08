@@ -92,11 +92,11 @@ TEST_CASE_TEMPLATE("Array accessors", T, Node, const Node) {
   }
 
   SUBCASE("at should throw with non-integral index") {
-    CHECK_THROWS_AS(node.at("key"), std::runtime_error);
+    CHECK_THROWS_AS(node.at("key"), std::invalid_argument);
   }
 
   SUBCASE("operator[] should throw with non-integral index") {
-    CHECK_THROWS_AS(node["key"], std::runtime_error);
+    CHECK_THROWS_AS(node["key"], std::invalid_argument);
   }
 }
 
@@ -143,7 +143,7 @@ TEST_CASE("Array modifiers") {
     }
 
     SUBCASE("erase should throw with non-integral index") {
-      CHECK_THROWS_AS(node.erase("key"), std::runtime_error);
+      CHECK_THROWS_AS(node.erase("key"), std::invalid_argument);
     }
 
     SUBCASE("clear") {
@@ -188,11 +188,11 @@ TEST_CASE_TEMPLATE("Object accessors", T, Node, const Node) {
   }
 
   SUBCASE("at should throw with non-string key") {
-    CHECK_THROWS_AS(node.at(0), std::runtime_error);
+    CHECK_THROWS_AS(node.at(0), std::invalid_argument);
   }
 
   SUBCASE("operator[] should throw with non-string key") {
-    CHECK_THROWS_AS(node[0], std::runtime_error);
+    CHECK_THROWS_AS(node[0], std::invalid_argument);
   }
 }
 
@@ -220,7 +220,7 @@ TEST_CASE("Object modifiers") {
     }
 
     SUBCASE("erase should throw with non-string key") {
-      CHECK_THROWS_AS(node.erase(0), std::runtime_error);
+      CHECK_THROWS_AS(node.erase(0), std::invalid_argument);
     }
 
     SUBCASE("clear") {

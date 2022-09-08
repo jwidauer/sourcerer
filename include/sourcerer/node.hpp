@@ -169,13 +169,12 @@ class SOURCERER_API Node {
   }
 
   bool operator==(const Node& other) const;
-  bool operator!=(const Node& other) const;
 
   void swap(Node& other) noexcept;
 
   template <typename T>
   T as() const {
-    return std::visit([](auto&& arg) { return detail::from<T>(arg); }, children_);
+    return std::visit([](const auto& arg) { return detail::from<T>(arg); }, children_);
   }
 
   iterator begin() noexcept;
@@ -205,7 +204,7 @@ class SOURCERER_API Node {
     try {
       return std::get<T>(children_);
     } catch (const std::exception& e) {
-      throw std::runtime_error("Node is not an " + detail::type_name<T>());
+      throw std::invalid_argument("Node is not an " + detail::type_name<T>());
     }
   }
 
@@ -214,7 +213,7 @@ class SOURCERER_API Node {
     try {
       return std::get<T>(children_);
     } catch (const std::exception& e) {
-      throw std::runtime_error("Node is not an " + detail::type_name<T>());
+      throw std::invalid_argument("Node is not an " + detail::type_name<T>());
     }
   }
 
@@ -232,7 +231,7 @@ class SOURCERER_API Node {
     children_.emplace<object_t>();
 
     for (const auto& [key, node] : value) {
-      std::get<object_t>(children_).emplace(key, std::make_unique<Node>(this, *node));
+      std::get<object_t>(children_).try_emplace(key, std::make_unique<Node>(this, *node));
     }
   }
 
@@ -243,7 +242,7 @@ class SOURCERER_API Node {
   template <class T>
   void prepare_for(const std::string& error_msg) {
     if (!(is_null() || is<T>())) {
-      throw std::runtime_error(error_msg);
+      throw std::invalid_argument(error_msg);
     }
 
     if (is_null()) {

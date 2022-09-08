@@ -2,10 +2,10 @@
 
 #include <sourcerer/detail/helpers.hpp>
 
+#include <map>
 #include <memory>
 #include <string>
 #include <type_traits>
-#include <map>
 #include <variant>
 #include <vector>
 
@@ -21,7 +21,7 @@ using key_t = std::string;
 using null_t = std::monostate;
 using value_t = std::string;
 using array_t = std::vector<std::unique_ptr<Node>>;
-using object_t = std::map<key_t, std::unique_ptr<Node>>;
+using object_t = std::map<key_t, std::unique_ptr<Node>, std::less<>>;
 
 template <class T>
 constexpr std::string type_name() noexcept {
