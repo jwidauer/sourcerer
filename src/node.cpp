@@ -117,7 +117,7 @@ void Node::erase(const key_type& key) {
 
 void Node::clear() {
   std::visit(
-      detail::overloaded{[](const null_t&) { /* null is always empty */ }, [](auto& v) { v.clear(); }},
+      detail::overloaded{[](null_t&) { /* null is always empty */ }, [](auto& v) { v.clear(); }},
       children_);
 }
 
