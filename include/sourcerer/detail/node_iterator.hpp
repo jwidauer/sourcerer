@@ -37,13 +37,13 @@ class iter_impl {
   explicit iter_impl(pointer node) : node_{node} {
     assert(node_ != nullptr);
 
-    std::visit(overloaded{[this](auto&) { iter_.simple = 0; },
-                          [this](BasicNode::array_t&) {
-                            iter_.array = typename BasicNode::array_t::iterator{};
-                          },
-                          [this](BasicNode::object_t&) {
-                            iter_.object = typename BasicNode::object_t::iterator{};
-                          }},
+    std::visit(detail::overloaded{[this](auto&) { iter_.simple = 0; },
+                                  [this](BasicNode::array_t&) {
+                                    iter_.array = typename BasicNode::array_t::iterator{};
+                                  },
+                                  [this](BasicNode::object_t&) {
+                                    iter_.object = typename BasicNode::object_t::iterator{};
+                                  }},
                node_->children_);
   }
 
@@ -51,19 +51,19 @@ class iter_impl {
   void set_begin() {
     assert(node_ != nullptr);
 
-    std::visit(overloaded{[this](auto&) { iter_.simple = 1; },
-                          [this](BasicNode::value_t&) { iter_.simple = 0; },
-                          [this](BasicNode::array_t& v) { iter_.array = std::begin(v); },
-                          [this](BasicNode::object_t& v) { iter_.object = std::begin(v); }},
+    std::visit(detail::overloaded{[this](auto&) { iter_.simple = 1; },
+                                  [this](BasicNode::value_t&) { iter_.simple = 0; },
+                                  [this](BasicNode::array_t& v) { iter_.array = std::begin(v); },
+                                  [this](BasicNode::object_t& v) { iter_.object = std::begin(v); }},
                node_->children_);
   }
 
   void set_end() {
     assert(node_ != nullptr);
 
-    std::visit(overloaded{[this](auto&) { iter_.simple = 1; },
-                          [this](BasicNode::array_t& v) { iter_.array = std::end(v); },
-                          [this](BasicNode::object_t& v) { iter_.object = std::end(v); }},
+    std::visit(detail::overloaded{[this](auto&) { iter_.simple = 1; },
+                                  [this](BasicNode::array_t& v) { iter_.array = std::end(v); },
+                                  [this](BasicNode::object_t& v) { iter_.object = std::end(v); }},
                node_->children_);
   }
 
@@ -72,12 +72,12 @@ class iter_impl {
     assert(node_ != nullptr);
 
     return std::visit(
-        overloaded{[this](auto&) {
-                     if (iter_.simple != 0) throw std::out_of_range{""};
-                     return node_;
-                   },
-                   [this](BasicNode::array_t&) { return iter_.array->get(); },
-                   [this](BasicNode::object_t&) { return iter_.object->second.get(); }},
+        detail::overloaded{[this](auto&) {
+                             if (iter_.simple != 0) throw std::out_of_range{""};
+                             return node_;
+                           },
+                           [this](BasicNode::array_t&) { return iter_.array->get(); },
+                           [this](BasicNode::object_t&) { return iter_.object->second.get(); }},
         node_->children_);
   }
 
@@ -86,12 +86,12 @@ class iter_impl {
   iter_impl& operator++() {
     assert(node_ != nullptr);
 
-    std::visit(overloaded{[this](auto&) {
-                            if (iter_.simple != 0) throw std::out_of_range{""};
-                            ++iter_.simple;
-                          },
-                          [this](BasicNode::array_t&) { ++iter_.array; },
-                          [this](BasicNode::object_t&) { ++iter_.object; }},
+    std::visit(detail::overloaded{[this](auto&) {
+                                    if (iter_.simple != 0) throw std::out_of_range{""};
+                                    ++iter_.simple;
+                                  },
+                                  [this](BasicNode::array_t&) { ++iter_.array; },
+                                  [this](BasicNode::object_t&) { ++iter_.object; }},
                node_->children_);
     return *this;
   }
@@ -105,12 +105,12 @@ class iter_impl {
   iter_impl& operator--() {
     assert(node_ != nullptr);
 
-    std::visit(overloaded{[this](auto&) {
-                            if (iter_.simple != 1) throw std::out_of_range{""};
-                            --iter_.simple;
-                          },
-                          [this](BasicNode::array_t&) { --iter_.array; },
-                          [this](BasicNode::object_t&) { --iter_.object; }},
+    std::visit(detail::overloaded{[this](auto&) {
+                                    if (iter_.simple != 1) throw std::out_of_range{""};
+                                    --iter_.simple;
+                                  },
+                                  [this](BasicNode::array_t&) { --iter_.array; },
+                                  [this](BasicNode::object_t&) { --iter_.object; }},
                node_->children_);
     return *this;
   }
@@ -127,7 +127,7 @@ class iter_impl {
     assert(node_ != nullptr);
 
     return std::visit(
-        overloaded{
+        detail::overloaded{
             [this, &other](auto&) { return iter_.simple == other.iter_.simple; },
             [this, &other](BasicNode::array_t&) { return iter_.array == other.iter_.array; },
             [this, &other](BasicNode::object_t&) { return iter_.object == other.iter_.object; }},

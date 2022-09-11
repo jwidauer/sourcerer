@@ -1,5 +1,7 @@
 #pragma once
 
+#include <sourcerer/detail/node_forwards.hpp>
+
 #include <concepts>
 #include <iterator>
 #include <type_traits>
@@ -7,9 +9,16 @@
 
 namespace sourcerer::detail {
 
-template <typename T>
+template <class T>
 concept number = std::is_arithmetic_v<T> && !
 std::same_as<T, bool>;
+
+template <class T>
+concept child = std::same_as<T, null_t> || std::same_as<T, value_t> || std::same_as<T, array_t> ||
+                std::same_as<T, object_t>;
+
+template <class T>
+concept child_variant = std::same_as<T, std::variant<null_t, value_t, array_t, object_t>>;
 
 template <class T>
 concept basic_node =

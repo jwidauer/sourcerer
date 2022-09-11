@@ -2,9 +2,9 @@
 
 #include <sourcerer/common.hpp>
 #include <sourcerer/detail/concepts.hpp>
-#include <sourcerer/detail/from.hpp>
+#include <sourcerer/detail/magic_cast.hpp>
 #include <sourcerer/detail/node_iterator.hpp>
-#include <sourcerer/detail/types.hpp>
+#include <sourcerer/detail/type_name.hpp>
 
 #include <algorithm>
 #include <functional>
@@ -115,14 +115,14 @@ class SOURCERER_API Node {
 
   template <class T>
   void push_back(const T& value) {
-    push_back(Node{detail::from(value)});
+    push_back(Node{detail::magic_cast(value)});
   }
 
   void emplace_back(const Node& node);
 
   template <class T>
   void emplace_back(const T& value) {
-    emplace_back(Node{detail::from(value)});
+    emplace_back(Node{detail::magic_cast(value)});
   }
 
   void erase(const size_type index);
@@ -136,28 +136,28 @@ class SOURCERER_API Node {
 
   template <class T>
   void insert(const size_type index, const T& value) {
-    insert(index, Node{detail::from(value)});
+    insert(index, Node{detail::magic_cast(value)});
   }
 
   void emplace(const size_type index, const Node& node);
 
   template <class T>
   void emplace(const size_type index, const T& value) {
-    emplace(index, Node{detail::from(value)});
+    emplace(index, Node{detail::magic_cast(value)});
   }
 
   void insert(const key_type& key, const Node& node);
 
   template <class T>
   void insert(const key_type& key, const T& value) {
-    insert(key, Node{detail::from(value)});
+    insert(key, Node{detail::magic_cast(value)});
   }
 
   void emplace(const key_type& key, const Node& node);
 
   template <class T>
   void emplace(const key_type& key, const T& value) {
-    emplace(key, Node{detail::from(value)});
+    emplace(key, Node{detail::magic_cast(value)});
   }
 
   reference operator=(const Node& other);
@@ -165,7 +165,7 @@ class SOURCERER_API Node {
 
   template <class T>
   reference operator=(const T& value) {
-    return operator=(Node{detail::from(value)});
+    return operator=(Node{detail::magic_cast(value)});
   }
 
   bool operator==(const Node& other) const;
@@ -174,7 +174,7 @@ class SOURCERER_API Node {
 
   template <typename T>
   T as() const {
-    return std::visit([](const auto& arg) { return detail::from<T>(arg); }, children_);
+    return std::visit([](const auto& arg) { return detail::magic_cast<T>(arg); }, children_);
   }
 
   iterator begin() noexcept;
@@ -191,32 +191,6 @@ class SOURCERER_API Node {
   // }
 
  private:
-  std::string type_name() const noexcept {
-    return std::visit(
-        overloaded{[](const null_t&) { return "null"; }, [](const value_t&) { return "value"; },
-                   [](const array_t&) { return "array"; },
-                   [](const object_t&) { return "object"; }},
-        children_);
-  }
-
-  template <class T>
-  auto& get() {
-    try {
-      return std::get<T>(children_);
-    } catch (const std::exception& e) {
-      throw std::invalid_argument("Node is not an " + detail::type_name<T>());
-    }
-  }
-
-  template <class T>
-  const auto& get() const {
-    try {
-      return std::get<T>(children_);
-    } catch (const std::exception& e) {
-      throw std::invalid_argument("Node is not an " + detail::type_name<T>());
-    }
-  }
-
   void copy(const null_t&) { children_.emplace<null_t>(); }
   void copy(const value_t& value) { children_.emplace<value_t>(value); }
   void copy(const array_t& value) {
@@ -233,10 +207,6 @@ class SOURCERER_API Node {
     for (const auto& [key, node] : value) {
       std::get<object_t>(children_).try_emplace(key, std::make_unique<Node>(this, *node));
     }
-  }
-
-  std::unique_ptr<Node> create_from(const Node& other) {
-    return std::make_unique<Node>(this, other);
   }
 
   template <class T>
