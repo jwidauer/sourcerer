@@ -15,6 +15,7 @@ jobs:
       - name: Install clang-format
         run: |
           sudo add-apt-repository --yes "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main"
+          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
           sudo apt update
           sudo apt install --yes --no-install-recommends clang-format-16
       - name: Run clang-format

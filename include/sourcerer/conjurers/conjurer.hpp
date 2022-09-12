@@ -1,13 +1,14 @@
 #pragma once
 
-namespace sourcerer {
-namespace conjurers {
+#include <string>
+
+namespace sourcerer::conjurers {
 
 class Conjurer {
  public:
   virtual ~Conjurer() = default;
+
+  virtual std::string conjure() = 0;
 };
 
-}  // namespace conjurers
-
-}  // namespace sourcerer
+}  // namespace sourcerer::conjurers
