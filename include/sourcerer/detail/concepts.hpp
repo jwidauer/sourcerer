@@ -10,8 +10,7 @@
 namespace sourcerer::detail {
 
 template <class T>
-concept number = std::is_arithmetic_v<T> && !
-std::same_as<T, bool>;
+concept number = std::is_arithmetic_v<T> && !std::same_as<T, bool>;
 
 template <class T>
 concept child = std::same_as<T, null_t> || std::same_as<T, value_t> || std::same_as<T, array_t> ||
