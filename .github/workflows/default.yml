@@ -18,7 +18,9 @@ jobs:
           repo: deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main
           repo-name: llvm-toolchain
           keys-asc: https://apt.llvm.org/llvm-snapshot.gpg.key
-          install: clang-format-16
+          install: clang-format
+      - name: Show clang-format version
+        run: clang-format --version
       - name: Run clang-format
         run: ./tools/run-clang-format.py -r include src tests
 
