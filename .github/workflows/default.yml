@@ -12,12 +12,13 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v3
-      - name: Install clang-format
-        run: |
-          sudo echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main" > /etc/apt/sources.list.d/llvm.list
-          wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-          sudo apt update
-          sudo apt install --yes --no-install-recommends clang-format-16
+      - name: Set up clang-format
+        uses: myci-actions/add-deb-repo@10
+        with:
+          repo: deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main
+          repo-name: llvm-toolchain
+          keys-asc: https://apt.llvm.org/llvm-snapshot.gpg.key
+          install: clang-format-16
       - name: Run clang-format
         run: ./tools/run-clang-format.py -r include src tests
 
