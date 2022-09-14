@@ -15,7 +15,7 @@ jobs:
       - name: Set up clang-format
         uses: myci-actions/add-deb-repo@10
         with:
-          repo: deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-15 main
+          repo: deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy main
           repo-name: llvm-toolchain
           keys-asc: https://apt.llvm.org/llvm-snapshot.gpg.key
           install: clang-format-16
