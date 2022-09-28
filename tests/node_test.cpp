@@ -1,7 +1,6 @@
-#define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
 #include <sourcerer/node.hpp>
 
-#include "doctest.h"
+#include <doctest.h>
 
 TEST_SUITE_BEGIN("[Node]");
 using namespace sourcerer;

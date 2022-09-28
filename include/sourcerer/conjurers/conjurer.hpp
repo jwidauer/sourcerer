@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace sourcerer::conjurers {
+namespace sourcerer {
 
 class Conjurer {
  public:
@@ -11,4 +11,4 @@ class Conjurer {
   virtual std::string conjure() = 0;
 };
 
-}  // namespace sourcerer::conjurers
+}  // namespace sourcerer

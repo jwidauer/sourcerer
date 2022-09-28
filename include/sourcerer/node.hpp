@@ -1,11 +1,5 @@
 #pragma once
 
-#include <sourcerer/common.hpp>
-#include <sourcerer/detail/concepts.hpp>
-#include <sourcerer/detail/magic_cast.hpp>
-#include <sourcerer/detail/node_iterator.hpp>
-#include <sourcerer/detail/type_name.hpp>
-
 #include <algorithm>
 #include <functional>
 #include <iterator>
@@ -13,6 +7,12 @@
 #include <string>
 #include <variant>
 #include <vector>
+
+#include "sourcerer/common.hpp"
+#include "sourcerer/detail/concepts.hpp"
+#include "sourcerer/detail/magic_cast.hpp"
+#include "sourcerer/detail/node_iterator.hpp"
+#include "sourcerer/detail/type_name.hpp"
 
 namespace sourcerer {
 

@@ -1,3 +1,5 @@
+json_dep = dependency('nlohmann_json')
+
 sources = [
     'node.cpp'
 ]
@@ -9,6 +11,7 @@ lib_args = ['-DBUILDING_SOURCERER']
 lib = library('sourcerer',
     sources, 
     include_directories: include_dirs,
+    dependencies: json_dep,
     install: true,
     cpp_args: lib_args,
     gnu_symbol_visibility: 'hidden'

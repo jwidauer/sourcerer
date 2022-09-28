@@ -1,8 +1,9 @@
-#include <sourcerer/detail/helpers.hpp>
-#include <sourcerer/node.hpp>
+#include "sourcerer/node.hpp"
 
 #include <cassert>
 #include <memory>
+
+#include "sourcerer/detail/helpers.hpp"
 
 namespace sourcerer {
 

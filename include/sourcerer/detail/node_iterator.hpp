@@ -1,11 +1,11 @@
 #pragma once
 
-#include <sourcerer/common.hpp>
-#include <sourcerer/detail/helpers.hpp>
-
 #include <cassert>
 #include <compare>
 #include <variant>
+
+#include "sourcerer/common.hpp"
+#include "sourcerer/detail/helpers.hpp"
 
 namespace sourcerer::detail {
 
