@@ -1,8 +1,8 @@
 doctest_dep = dependency('doctest')
 
 test_sources = [
-    'conjurers/string_conjurer_test.cpp',
     'conjurers/file_conjurer_test.cpp',
+    'conjurers/string_conjurer_test.cpp',
     'main.cpp',
     'node_test.cpp',
 ]

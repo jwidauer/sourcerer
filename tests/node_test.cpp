@@ -15,13 +15,13 @@ TEST_CASE("Simple constructors") {
 
   SUBCASE("Copy constructor") {
     Node node1{Node::array_t{}};
-    Node node2(node1);
+    Node node2{node1};
     CHECK(node2.is_array());
   }
 
   SUBCASE("Default constructor with parent") {
     Node node1;
-    Node node2(&node1);
+    Node node2{&node1};
     CHECK(node2.is_null());
     CHECK(node2.parent() == &node1);
   }
@@ -392,6 +392,30 @@ TEST_CASE("Iterator") {
       it1++;
       CHECK(it1 != it2);
     }
+  }
+}
+
+TEST_CASE("Value conversion") {
+  Node node;
+
+  SUBCASE("as string") {
+    node = "value";
+    CHECK(node.as<std::string>() == "value");
+  }
+
+  SUBCASE("as int") {
+    node = 1;
+    CHECK(node.as<int>() == 1);
+  }
+
+  SUBCASE("as double") {
+    node = 1.0;
+    CHECK(node.as<double>() == 1.0);
+  }
+
+  SUBCASE("as bool") {
+    node = true;
+    CHECK(node.as<bool>() == true);
   }
 }
 

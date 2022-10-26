@@ -8,6 +8,8 @@ TEST_SUITE_BEGIN("[FileConjurer]");
 
 TEST_CASE("Conjure") {
   const auto tmp_file{std::tmpfile()};
+  CHECK(tmp_file != nullptr);
+
   std::fputs("Hello, world!", tmp_file);
   std::rewind(tmp_file);
 

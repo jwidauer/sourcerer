@@ -11,35 +11,29 @@
 namespace sourcerer::detail {
 
 template <class T, class U>
-T magic_cast(const U& /*value*/) {
+auto magic_cast(const U& /*value*/) -> T {
   throw std::invalid_argument{"Can't convert magic_cast " + type_name<U>() + " to " +
                               type_name<T>()};
 }
 
 template <class T>
   requires std::constructible_from<T, value_t>
-constexpr T magic_cast(const value_t& value) {
+constexpr auto magic_cast(const value_t& value) -> T {
   return value;
 }
 
 template <class T>
   requires std::constructible_from<value_t, T>
-constexpr value_t magic_cast(const T& value) {
+constexpr auto magic_cast(const T& value) -> value_t {
   return value;
 }
 
-template <>
-bool magic_cast(const value_t& value) {
-  return value == "true" || value == "1";
-}
+auto magic_cast(const value_t& value) -> bool { return value == "true" || value == "1"; }
 
-template <>
-value_t magic_cast(const bool& value) {
-  return value ? "true" : "false";
-}
+auto magic_cast(const bool& value) -> value_t { return value ? "true" : "false"; }
 
 template <number T>
-T magic_cast(const value_t& value) {
+auto magic_cast(const value_t& value) -> T {
   const std::string_view sv{value};
   T result;
   auto [ptr, ec]{std::from_chars(sv.begin(), sv.end(), result)};
@@ -52,7 +46,7 @@ T magic_cast(const value_t& value) {
 }
 
 template <number T>
-value_t magic_cast(const T& value) {
+auto magic_cast(const T& value) -> value_t {
   constexpr auto buffer_size{std::is_integral_v<T> ? std::numeric_limits<T>::digits10 + 1 : 100};
 
   std::array<char, buffer_size> buffer;

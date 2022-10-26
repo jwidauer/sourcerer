@@ -165,7 +165,7 @@ class SOURCERER_API Node {
 
   template <class T>
   reference operator=(const T& value) {
-    return operator=(Node{detail::magic_cast(value)});
+    return operator=(Node{std::string{detail::magic_cast(value)}});
   }
 
   bool operator==(const Node& other) const;
@@ -174,7 +174,7 @@ class SOURCERER_API Node {
 
   template <typename T>
   T as() const {
-    return std::visit([](const auto& arg) { return detail::magic_cast<T>(arg); }, children_);
+    return std::visit([](const auto& arg) -> T { return T{detail::magic_cast(arg)}; }, children_);
   }
 
   iterator begin() noexcept;
